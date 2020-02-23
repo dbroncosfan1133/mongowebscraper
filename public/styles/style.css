@@ -1,0 +1,26 @@
+#background {
+    background-image: url("/images/background-image.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 450px;
+}
+
+#title {
+    font-size: 85px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+#subtitle {
+    font-size: 40px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.header_color {
+    background-color: #33b952;
+
+}
+
+.header_font {
+    font-size: 25px;
+    color: white;
+}

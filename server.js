@@ -1,4 +1,5 @@
 var express = require("express");
+var exphbs = require("express-handlebars");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 
@@ -9,7 +10,7 @@ var cheerio = require("cheerio");
 // Require models folder and its contents
 var db = require("./models");
 
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
 // Initialize Express
 var app = express();
@@ -23,11 +24,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
+app.use(express.static("views"));
+
+app.engine(
+    "handlebars",
+    exphbs({
+        defaultLayout: "main"
+    })
+);
+app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB
 mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true });
 
 // Routes
+
+app.get("/", function (req, res) {
+    res.render("index")
+})
 
 // GET route for scraping hjnews website
 app.get("/scrape", function (req, res) {
@@ -61,6 +75,15 @@ app.get("/scrape", function (req, res) {
     });
 });
 
+app.get("/articles", function (req, res) {
+    db.Articles.find({})
+        .then(function (dbArticles) {
+            res.json(dbArticles);
+        })
+        .catch(function (err) {
+            res.json(err);
+        });
+});
 
 
 
