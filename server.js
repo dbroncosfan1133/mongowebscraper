@@ -40,38 +40,51 @@ mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true 
 // Routes
 
 app.get("/", function (req, res) {
-    res.render("index")
-})
+    db.Articles.find({
+        saved: false
+    },
+
+        function (error, dbArticles) {
+            if (error) {
+                console.log(error);
+            } else {
+                res.render("index", {
+                    articles: dbArticles
+                });
+            }
+        }).lean();
+});
 
 // GET route for scraping hjnews website
 app.get("/scrape", function (req, res) {
     //Axios grabs HTML body
-    axios.get("https://www.cachevalleydaily.com/").then(function (response) {
+    axios.get("https://www.hjnews.com/").then(function (response) {
         //Loads in to cheerio and create shorthand
         var $ = cheerio.load(response.data);
 
         //What we are grabbing from target site
-        $("h3.recent-title").each(function (i, element) {
-            var result = {};
+        $("div.card-body").each(function (i, element) {
+            // var result = {};
 
-            result.title = $(this)
-                .children("a")
-                .text();
-            result.link = $(this)
-                .children("a")
-                .attr("href");
+            var title = $(this).children("div.card-headline").children("h3.tnt-headline").text().trim();
+            var link = "https://www.hjnews.com" + $(this).children("div.card-headline").children("h3.tnt-headline").children("a").attr("href");
+            var info = $(this).children("div.card-lead").children("p.tnt-summary").text().trim();
 
-            db.Articles.create(result)
-                .then(function (dbArticles) {
-                    console.log(dbArticles);
-                })
-                .catch(function (err) {
-                    console.log(err);
-                });
-
-
+            if (title && link && info) {
+                db.Articles.create({
+                    title: title,
+                    link: link,
+                    info: info
+                },
+                    function (err, results) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            console.log(results);
+                        }
+                    });
+            }
         });
-        res.send("Scrape Complete");
     });
 });
 

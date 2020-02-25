@@ -24,3 +24,11 @@
     font-size: 25px;
     color: white;
 }
+
+.article_info {
+    padding: 10px 24px 5px 24px;
+}
+
+.info_font {
+    color: black;
+}

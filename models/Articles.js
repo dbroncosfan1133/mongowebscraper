@@ -5,11 +5,19 @@ var Schema = mongoose.Schema;
 var ArticlesSchema = new Schema({
     title: {
         type: String,
-        required: true
+        required: false
     },
     link: {
         type: String,
-        required: true
+        required: false
+    },
+    info: {
+        type: String,
+        required: false
+    },
+    saved: {
+        type: Boolean,
+        default: false
     },
     note: {
         type: Schema.Types.ObjectId,

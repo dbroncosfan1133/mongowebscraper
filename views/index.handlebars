@@ -1,11 +1,22 @@
 <div class="container">
+    <h1 class="is-size-2">Articles:</h1>
+    {{#each articles}}
     <div class="tile is-ancestor">
         <div class="tile is-vertical is-12">
             <div class="tile">
                 <div class="tile is-parent is-vertical articles">
-                    <br>
+                    <div class="tile is-child box">
+                        <div class="hero is-success is-bold is-small">
+                            <div class="hero-body">
+                                <h3 class="title is-size-3"><a class="header_font"
+                                        href="{{link}}">{{title}}</a></h3>
+                            </div>
+                        </div>
+                        <p class="subtitle is-size-5 article_info"><a class="info_font" href="{{link}}">{{info}}</a></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    {{/each}}
 </div>
