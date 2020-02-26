@@ -76,29 +76,57 @@ app.get("/scrape", function (req, res) {
                     link: link,
                     info: info
                 },
-                    function (err, results) {
-                        if (err) {
-                            console.log(err);
+                    function (error, results) {
+                        if (error) {
+                            console.log(error);
                         } else {
                             console.log(results);
                         }
                     });
             }
         });
+        res.sendStatus(204);
     });
 });
 
-app.get("/articles", function (req, res) {
-    db.Articles.find({})
+app.get("/saved", function (req, res) {
+    db.Articles.find({ 
+        saved: true 
+    },
+        function(error, dbArticles) {
+            if(error) {
+                console.log(error)
+            } else {
+                res.render("saved_articles", {
+                    articles: dbArticles
+                });
+            }
+        }).lean();
+});
+
+app.put("/saved/:id", function (req, res) {
+    db.Articles.findByIdAndUpdate(
+        req.params.id, {
+        $set: req.body
+    }, {
+        new: true
+    })
         .then(function (dbArticles) {
-            res.json(dbArticles);
+            res.json(dbArticles)
+            // res.render("saved_articles", {
+            //     articles: dbArticles
+            // }).lean();
         })
         .catch(function (err) {
             res.json(err);
         });
 });
 
-
+app.get("/delete", function (req, res) {
+    db.Articles.deleteMany({})
+        .then(
+            res.sendStatus(204));
+});
 
 app.listen(PORT, function () {
     console.log("App is running on port " + PORT);
