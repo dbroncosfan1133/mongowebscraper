@@ -12,9 +12,10 @@ $("#clear_articles").on("click", function (event) {
     });
 });
 
-$("#save_article").on("click", function () {
+$(".save_article").on("click", function () {
     var saved_article = $(this).data();
     saved_article.saved = true;
+    console.log("clicked")
 
     var id = $(this).attr("data-articleId");
     $.ajax("/saved/" + id, {
@@ -27,7 +28,7 @@ $("#save_article").on("click", function () {
     );
 });
 
-$("#remove_article").on("click", function () {
+$(".remove_article").on("click", function () {
     var removed_article = $(this).data();
     var id = $(this).attr("data-articleId");
     removed_article.saved = false;
@@ -40,4 +41,12 @@ $("#remove_article").on("click", function () {
             location.reload();
         }
     );
+});
+
+$(".save_note").on("click", function () {
+    $(".new_note_modal").addClass("is-active");
+});
+
+$("#cancel_note").on("click", function () {
+    $(".new_note_modal").removeClass("is-active");
 });

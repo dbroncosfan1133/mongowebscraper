@@ -19,6 +19,7 @@ var app = express();
 
 // Log requests with morgan logger
 app.use(logger("dev"));
+
 // Parse request body as JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -119,6 +120,24 @@ app.put("/saved/:id", function (req, res) {
         })
         .catch(function (err) {
             res.json(err);
+        });
+});
+
+app.get("/newnote/:id", function(req, res) {
+    db.Notes.create(req.body)
+        .then(function(dbNotes) {
+            var articleId = mongoose.Types.ObjectId(req.params.id)
+            return db.Articles.findByIdAndUpdate(articleId, {
+                $push: {
+                    notes: dbNote._id
+                }
+            })
+        })
+        .then(function(dbArticles) {
+            res.json(dbNotes);
+        })
+        .catch(function(error) {
+            res.json(error);
         });
 });
 
