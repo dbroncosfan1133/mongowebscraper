@@ -40,6 +40,7 @@ mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true 
 
 // Routes
 
+// Route for grabbing all articles stored in DB
 app.get("/", function (req, res) {
     db.Articles.find({
         saved: false
@@ -56,21 +57,20 @@ app.get("/", function (req, res) {
         }).lean();
 });
 
-// GET route for scraping hjnews website
+// Route for scraping hjnews website
 app.get("/scrape", function (req, res) {
     //Axios grabs HTML body
     axios.get("https://www.hjnews.com/").then(function (response) {
         //Loads in to cheerio and create shorthand
         var $ = cheerio.load(response.data);
 
-        //What we are grabbing from target site
+        // Elements from target site to scrape
         $("div.card-body").each(function (i, element) {
-            // var result = {};
-
             var title = $(this).children("div.card-headline").children("h3.tnt-headline").text().trim();
             var link = "https://www.hjnews.com" + $(this).children("div.card-headline").children("h3.tnt-headline").children("a").attr("href");
             var info = $(this).children("div.card-lead").children("p.tnt-summary").text().trim();
 
+            // Only displays articles to page if all three values are available
             if (title && link && info) {
                 db.Articles.create({
                     title: title,
@@ -90,6 +90,7 @@ app.get("/scrape", function (req, res) {
     });
 });
 
+// Route to save articles to saved page
 app.get("/saved", function (req, res) {
     db.Articles.find({ 
         saved: true 
@@ -105,6 +106,7 @@ app.get("/saved", function (req, res) {
         }).lean();
 });
 
+// Route to update article saved value to true
 app.put("/saved/:id", function (req, res) {
     db.Articles.findByIdAndUpdate(
         req.params.id, {
@@ -123,24 +125,33 @@ app.put("/saved/:id", function (req, res) {
         });
 });
 
-app.get("/newnote/:id", function(req, res) {
+// *****************************************************************
+// Notes are stored in DB but not currently tied to specific articles.
+//Currently you cannot view or modify notes either.
+//******************************************************************
+
+app.post("/newnote/:id", function(req, res) {
+    console.log(req.body);
+    console.log(req.params.id);
     db.Notes.create(req.body)
-        .then(function(dbNotes) {
-            var articleId = mongoose.Types.ObjectId(req.params.id)
-            return db.Articles.findByIdAndUpdate(articleId, {
-                $push: {
-                    notes: dbNote._id
-                }
-            })
-        })
-        .then(function(dbArticles) {
-            res.json(dbNotes);
-        })
-        .catch(function(error) {
-            res.json(error);
-        });
+    .then(function(dbNotes) {
+        return db.Articles.findOneAndUpdate(
+            {_id: req.params.id},
+            {$push:
+                {notes: dbNotes._id}
+            },
+            {new: true }
+        );
+    })
+    .then(function(dbArticles) {
+        res.json(dbArticles);
+    })
+    .catch(function(error) {
+        res.json(error);
+    });
 });
 
+// Route to delete scraped articles in database
 app.get("/delete", function (req, res) {
     db.Articles.deleteMany({})
         .then(
