@@ -10,9 +10,7 @@ var cheerio = require("cheerio");
 // Require models folder and its contents
 var db = require("./models");
 
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
-
-mongoose.connect(MONGODB_URI);
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoWebScraper";
 
 // Initialize Express
 var app = express();
@@ -38,6 +36,7 @@ app.engine(
 app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB
+mongoose.connect(MONGODB_URI);
 // mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true });
 
 // Routes
@@ -94,11 +93,11 @@ app.get("/scrape", function (req, res) {
 
 // Route to save articles to saved page
 app.get("/saved", function (req, res) {
-    db.Articles.find({ 
-        saved: true 
+    db.Articles.find({
+        saved: true
     },
-        function(error, dbArticles) {
-            if(error) {
+        function (error, dbArticles) {
+            if (error) {
                 console.log(error)
             } else {
                 res.render("saved_articles", {
@@ -132,25 +131,26 @@ app.put("/saved/:id", function (req, res) {
 //Currently you cannot view or modify notes either.
 //******************************************************************
 
-app.post("/newnote/:id", function(req, res) {
+app.post("/newnote/:id", function (req, res) {
     console.log(req.body);
     console.log(req.params.id);
     db.Notes.create(req.body)
-    .then(function(dbNotes) {
-        return db.Articles.findOneAndUpdate(
-            {_id: req.params.id},
-            {$push:
-                {notes: dbNotes._id}
-            },
-            {new: true }
-        );
-    })
-    .then(function(dbArticles) {
-        res.json(dbArticles);
-    })
-    .catch(function(error) {
-        res.json(error);
-    });
+        .then(function (dbNotes) {
+            return db.Articles.findOneAndUpdate(
+                { _id: req.params.id },
+                {
+                    $push:
+                        { notes: dbNotes._id }
+                },
+                { new: true }
+            );
+        })
+        .then(function (dbArticles) {
+            res.json(dbArticles);
+        })
+        .catch(function (error) {
+            res.json(error);
+        });
 });
 
 // Route to delete scraped articles in database
