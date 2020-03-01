@@ -160,6 +160,6 @@ app.get("/delete", function (req, res) {
             res.sendStatus(204));
 });
 
-app.listen(PORT, function () {
+app.listen(MONGODB_URI, function () {
     console.log("App is running on port " + PORT);
 });
