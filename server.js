@@ -10,7 +10,9 @@ var cheerio = require("cheerio");
 // Require models folder and its contents
 var db = require("./models");
 
-var PORT = process.env.PORT || 3000;
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI);
 
 // Initialize Express
 var app = express();
@@ -36,7 +38,7 @@ app.engine(
 app.set("view engine", "handlebars");
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true });
+// mongoose.connect("mongodb://localhost/mongoWebScraper", { useNewUrlParser: true });
 
 // Routes
 
